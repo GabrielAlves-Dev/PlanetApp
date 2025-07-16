@@ -6,13 +6,14 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.gabriel.planetapp.models.Planet
 import com.gabriel.planetapp.models.planetList
 import com.gabriel.planetapp.ui.components.BottomNavigationBar
 import com.gabriel.planetapp.ui.screens.DetailsScreen
@@ -39,6 +40,19 @@ fun NavGraph(
     onHelpClick: () -> Unit
 ) {
     val navController: NavHostController = rememberNavController()
+
+    var planets by remember { mutableStateOf(planetList) }
+
+    val onFavoriteToggle = { planet: Planet ->
+        val index = planets.indexOf(planet)
+        if (index != -1) {
+            val updatedPlanet = planet.copy(isFavorite = !planet.isFavorite)
+            val newPlanets = planets.toMutableList()
+            newPlanets[index] = updatedPlanet
+            planets = newPlanets
+        }
+    }
+
     Scaffold(
         bottomBar = { BottomNavigationBar(navController = navController) }
     ) { innerPadding ->
@@ -49,26 +63,27 @@ fun NavGraph(
         ) {
             composable(BottomBarScreen.Home.route) {
                 HomeScreen(
+                    planets = planets,
                     onPlanetSelected = { planet ->
                         navController.navigate("details/${planet.name}")
                     },
+                    onFavoriteToggle = onFavoriteToggle,
                     onSettingsClick = onSettingsClick,
                     onHelpClick = onHelpClick
                 )
             }
             composable(BottomBarScreen.Favorites.route) {
                 FavoritesScreen(
+                    planets = planets.filter { it.isFavorite },
                     onPlanetSelected = { planet ->
                         navController.navigate("details/${planet.name}")
                     },
-                    onFavoriteToggle = { planet ->
-                        planet.isFavorite = !planet.isFavorite
-                    }
+                    onFavoriteToggle = onFavoriteToggle
                 )
             }
             composable("details/{planetName}") { backStackEntry ->
                 val planetName = backStackEntry.arguments?.getString("planetName")
-                val selectedPlanet = planetList.first { it.name == planetName }
+                val selectedPlanet = planets.first { it.name == planetName }
                 DetailsScreen(selectedPlanet)
             }
         }

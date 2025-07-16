@@ -10,12 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.gabriel.planetapp.models.Planet
-import com.gabriel.planetapp.models.planetList
 import com.gabriel.planetapp.ui.components.PlanetListItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritesScreen(
+    planets: List<Planet>,
     onPlanetSelected: (Planet) -> Unit,
     onFavoriteToggle: (Planet) -> Unit
 ) {
@@ -31,9 +31,7 @@ fun FavoritesScreen(
             )
         }
     ) { innerPadding ->
-        val favoritePlanets = planetList.filter { it.isFavorite }
-
-        if (favoritePlanets.isEmpty()) {
+        if (planets.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -54,11 +52,11 @@ fun FavoritesScreen(
                     .padding(innerPadding)
                     .padding(horizontal = 8.dp)
             ) {
-                items(favoritePlanets) { planet ->
+                items(planets) { planet ->
                     PlanetListItem(
                         planet = planet,
-                        onPlanetSelected = { onPlanetSelected(it) },
-                        onFavoriteToggle = { onFavoriteToggle(it) }
+                        onPlanetSelected = onPlanetSelected,
+                        onFavoriteToggle = onFavoriteToggle
                     )
                 }
             }
