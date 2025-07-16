@@ -46,6 +46,7 @@ fun NavGraph(
     val navController: NavHostController = rememberNavController()
 
     var planets by remember { mutableStateOf(planetList) }
+    var recentSearches by remember { mutableStateOf<List<Planet>>(emptyList()) }
 
     val onFavoriteToggle = { planet: Planet ->
         val index = planets.indexOf(planet)
@@ -55,6 +56,18 @@ fun NavGraph(
             newPlanets[index] = updatedPlanet
             planets = newPlanets
         }
+    }
+
+    val onPlanetSelected = { planet: Planet ->
+        if (!recentSearches.contains(planet)) {
+            val updatedRecentSearches = recentSearches.toMutableList()
+            updatedRecentSearches.add(0, planet)
+            if (updatedRecentSearches.size > 3) {
+                updatedRecentSearches.removeAt(updatedRecentSearches.lastIndex)
+            }
+            recentSearches = updatedRecentSearches
+        }
+        navController.navigate("details/${planet.name}")
     }
 
     Scaffold(
@@ -68,9 +81,8 @@ fun NavGraph(
             composable(BottomBarScreen.Home.route) {
                 HomeScreen(
                     planets = planets,
-                    onPlanetSelected = { planet ->
-                        navController.navigate("details/${planet.name}")
-                    },
+                    recentSearches = recentSearches,
+                    onPlanetSelected = onPlanetSelected,
                     onFavoriteToggle = onFavoriteToggle,
                     onSettingsClick = onSettingsClick,
                     onHelpClick = onHelpClick
@@ -79,9 +91,7 @@ fun NavGraph(
             composable(BottomBarScreen.Favorites.route) {
                 FavoritesScreen(
                     planets = planets.filter { it.isFavorite },
-                    onPlanetSelected = { planet ->
-                        navController.navigate("details/${planet.name}")
-                    },
+                    onPlanetSelected = onPlanetSelected,
                     onFavoriteToggle = onFavoriteToggle
                 )
             }

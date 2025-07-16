@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -25,6 +27,7 @@ import com.gabriel.planetapp.ui.components.TopAppBarWithMenu
 @Composable
 fun HomeScreen(
     planets: List<Planet>,
+    recentSearches: List<Planet>,
     onPlanetSelected: (Planet) -> Unit,
     onFavoriteToggle: (Planet) -> Unit,
     onSettingsClick: () -> Unit,
@@ -52,6 +55,20 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .padding(8.dp)
             )
+
+            if (recentSearches.isNotEmpty()) {
+                LazyRow(
+                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(recentSearches) { planet ->
+                        Button(onClick = { onPlanetSelected(planet) }) {
+                            Text(planet.name)
+                        }
+                    }
+                }
+            }
+
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.padding(horizontal = 8.dp)
