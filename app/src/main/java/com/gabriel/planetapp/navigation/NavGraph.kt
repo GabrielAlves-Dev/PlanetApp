@@ -90,7 +90,8 @@ fun NavGraph(
                 val selectedPlanet = planets.first { it.name == planetName }
                 DetailsScreen(
                     planet = selectedPlanet,
-                    onBackClick = { navController.navigateUp() }
+                    onBackClick = { navController.navigateUp() },
+                    onFavoriteToggle = onFavoriteToggle
                 )
             }
         }
